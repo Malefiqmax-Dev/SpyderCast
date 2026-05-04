@@ -77,7 +77,6 @@ export function Navbar() {
                   href={link.href}
                   className="flex items-center gap-1 text-sm text-foreground/70 transition-colors hover:text-foreground"
                 >
-                  {link.icon && <link.icon className="h-3.5 w-3.5" />}
                   {link.label}
                 </Link>
               ))}

@@ -58,7 +58,7 @@ export function AppleTVPlusLogo({ className }: LogoProps) {
   return (
     <div className={className}>
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_Logo.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/2/28/Apple_TV_Plus_logo.svg"
         alt="Apple TV+"
         className="h-full w-full object-contain brightness-0 invert"
       />
@@ -94,7 +94,7 @@ export function CrunchyrollLogo({ className }: LogoProps) {
   return (
     <div className={className}>
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_Logo.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/0/08/Crunchyroll_logo.svg"
         alt="Crunchyroll"
         className="h-full w-full object-contain brightness-0 invert"
       />

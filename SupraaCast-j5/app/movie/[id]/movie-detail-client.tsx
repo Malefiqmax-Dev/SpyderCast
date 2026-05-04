@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Play, Star, Clock, Calendar, Heart, Eye, Film } from "lucide-react"
 import { getBackdropUrl, getImageUrl, getMovieTrailer } from "@/lib/tmdb"
 import { PlayerModal } from "@/components/player-modal"
+import { AdPlayerModal } from "@/components/ad-player-modal"
 import { useAuth } from "@/lib/auth-context"
 import { useState } from "react"
 import { getMoviePlayerUrl } from "@/lib/constants/player"
@@ -215,9 +216,12 @@ export function MovieDetailClient({ movie }: MovieDetailClientProps) {
         />
       )}
       {playerMode === "watch" && (
-        <PlayerModal
-          url={watchUrl}
-          title={`Regarder - ${movie.title}`}
+        <AdPlayerModal
+          tmdbId={movie.id}
+          mediaType="movie"
+          title={movie.title}
+          overview={movie.overview}
+          backdropPath={movie.backdrop_path}
           onClose={() => setPlayerMode(null)}
         />
       )}

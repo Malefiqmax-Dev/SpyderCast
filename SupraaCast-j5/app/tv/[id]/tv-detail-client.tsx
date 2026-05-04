@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Play, Download, Star, Calendar, ChevronDown, Heart, Eye } from "lucide-react"
 import { getBackdropUrl, getImageUrl } from "@/lib/tmdb"
 import { PlayerModal } from "@/components/player-modal"
+import { AdPlayerModal } from "@/components/ad-player-modal"
 import { useAuth } from "@/lib/auth-context"
 import { useState } from "react"
 import { getSeriesPlayerUrl } from "@/lib/constants/player"
@@ -304,9 +305,13 @@ export function TVDetailClient({ show, seasonDetails }: TVDetailClientProps) {
       </section>
 
       {playerInfo && (
-        <PlayerModal
-          url={getStreamUrl(playerInfo.season, playerInfo.episode)}
+        <AdPlayerModal
+          tmdbId={show.id}
+          mediaType="tv"
+          season={playerInfo.season}
+          episode={playerInfo.episode}
           title={playerInfo.title}
+          backdropPath={show.backdrop_path}
           onClose={() => setPlayerInfo(null)}
         />
       )}
