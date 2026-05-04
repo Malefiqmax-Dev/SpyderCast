@@ -1,0 +1,226 @@
+"use client"
+
+import Image from "next/image"
+import { Play, Star, Clock, Calendar, Heart, Eye, Film } from "lucide-react"
+import { getBackdropUrl, getImageUrl, getMovieTrailer } from "@/lib/tmdb"
+import { PlayerModal } from "@/components/player-modal"
+import { useAuth } from "@/lib/auth-context"
+import { useState } from "react"
+import { getMoviePlayerUrl } from "@/lib/constants/player"
+
+interface MovieDetailClientProps {
+  movie: {
+    id: number
+    title: string
+    overview: string
+    backdrop_path: string | null
+    poster_path: string | null
+    vote_average: number
+    release_date: string
+    runtime: number
+    genres: { id: number; name: string }[]
+    credits?: {
+      cast: { id: number; name: string; character: string; profile_path: string | null }[]
+    }
+  }
+}
+
+export function MovieDetailClient({ movie }: MovieDetailClientProps) {
+  const [playerMode, setPlayerMode] = useState<"watch" | "trailer" | null>(null)
+  const [trailerUrl, setTrailerUrl] = useState<string | null>(null)
+  const { user, toggleLike, toggleWatched, isLiked, isWatched } = useAuth()
+
+  const backdropUrl = getBackdropUrl(movie.backdrop_path)
+  const posterUrl = getImageUrl(movie.poster_path, "w500")
+  const year = movie.release_date ? new Date(movie.release_date).getFullYear() : null
+  const hours = Math.floor(movie.runtime / 60)
+  const minutes = movie.runtime % 60
+
+  const watchUrl = getMoviePlayerUrl(movie.id)
+
+  const liked = isLiked(movie.id, "movie")
+  const watched = isWatched(movie.id, "movie")
+
+  const mediaItem = {
+    id: movie.id,
+    type: "movie" as const,
+    title: movie.title,
+    poster_path: movie.poster_path,
+    vote_average: movie.vote_average,
+  }
+
+  async function playTrailer() {
+    const key = await getMovieTrailer(movie.id)
+    if (key) {
+      setTrailerUrl(`https://www.youtube.com/embed/${key}?autoplay=1`)
+      setPlayerMode("trailer")
+    }
+  }
+
+  return (
+    <>
+      <div className="relative min-h-[85vh]">
+        {backdropUrl && (
+          <Image
+            src={backdropUrl || "/placeholder.svg"}
+            alt={movie.title}
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/40 to-transparent" />
+
+        <div className="relative flex min-h-[85vh] items-end px-4 pb-12 pt-24 lg:px-8">
+          <div className="flex flex-col gap-8 md:flex-row md:items-end">
+            {posterUrl && (
+              <div className="hidden flex-shrink-0 md:block">
+                <Image
+                  src={posterUrl || "/placeholder.svg"}
+                  alt={movie.title}
+                  width={260}
+                  height={390}
+                  className="rounded-lg shadow-2xl shadow-amber-950/50"
+                />
+              </div>
+            )}
+            <div className="max-w-2xl">
+              <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl lg:text-5xl text-balance">
+                {movie.title}
+              </h1>
+
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-foreground/70">
+                <span className="flex items-center gap-1">
+                  <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  {movie.vote_average.toFixed(1)}
+                </span>
+                {year && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    {year}
+                  </span>
+                )}
+                {movie.runtime > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    {hours}h {minutes}min
+                  </span>
+                )}
+              </div>
+
+              {movie.genres.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {movie.genres.map((genre) => (
+                    <span
+                      key={genre.id}
+                      className="rounded-full border border-amber-700/40 bg-amber-950/50 px-3 py-1 text-xs text-amber-300"
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <p className="mt-4 leading-relaxed text-foreground/80 text-sm lg:text-base">
+                {movie.overview || "Aucune description disponible."}
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setPlayerMode("watch")}
+                  className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-3 text-sm font-semibold text-foreground transition-all hover:from-amber-400 hover:to-orange-500 hover:shadow-lg hover:shadow-amber-700/25"
+                >
+                  <Play className="h-5 w-5 fill-current" />
+                  Regarder
+                </button>
+
+                <button
+                  onClick={playTrailer}
+                  className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-foreground backdrop-blur-md transition-all hover:bg-white/10"
+                >
+                  <Film className="h-5 w-5" />
+                  Bande-annonce
+                </button>
+
+                {user && (
+                  <>
+                    <button
+                      onClick={() => toggleLike(mediaItem)}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold transition-all ${
+                        liked
+                          ? "border-pink-500/60 bg-pink-950/40 text-pink-400 hover:bg-pink-950/60"
+                          : "border-amber-700/40 bg-amber-950/50 text-foreground hover:bg-amber-900/50"
+                      }`}
+                      aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    >
+                      <Heart className={`h-5 w-5 ${liked ? "fill-pink-400" : ""}`} />
+                      {liked ? "Aime" : "J'aime"}
+                    </button>
+                    <button
+                      onClick={() => toggleWatched(mediaItem)}
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-3 text-sm font-semibold transition-all ${
+                        watched
+                          ? "border-emerald-500/60 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-950/60"
+                          : "border-amber-700/40 bg-amber-950/50 text-foreground hover:bg-amber-900/50"
+                      }`}
+                      aria-label={watched ? "Retirer de la liste" : "Marquer comme vu"}
+                    >
+                      <Eye className={`h-5 w-5 ${watched ? "fill-emerald-400" : ""}`} />
+                      {watched ? "Vu" : "Marquer vu"}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {movie.credits?.cast && movie.credits.cast.length > 0 && (
+        <section className="px-4 py-8 lg:px-8">
+          <h2 className="mb-4 font-display text-xl font-bold text-foreground">Casting</h2>
+          <div className="hide-scrollbar flex gap-4 overflow-x-auto">
+            {movie.credits.cast.slice(0, 12).map((person) => (
+              <div key={person.id} className="flex-shrink-0 text-center w-[100px]">
+                <div className="relative mx-auto h-[100px] w-[100px] overflow-hidden rounded-full">
+                  {person.profile_path ? (
+                    <Image
+                      src={getImageUrl(person.profile_path, "w185") || ""}
+                      alt={person.name}
+                      fill
+                      className="object-cover"
+                      sizes="100px"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-secondary text-muted-foreground text-xs">
+                      N/A
+                    </div>
+                  )}
+                </div>
+                <p className="mt-2 truncate text-xs font-medium text-foreground">{person.name}</p>
+                <p className="truncate text-xs text-muted-foreground">{person.character}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {playerMode === "trailer" && trailerUrl && (
+        <PlayerModal
+          url={trailerUrl}
+          title={`Bande-annonce - ${movie.title}`}
+          onClose={() => { setPlayerMode(null); setTrailerUrl(null) }}
+        />
+      )}
+      {playerMode === "watch" && (
+        <PlayerModal
+          url={watchUrl}
+          title={`Regarder - ${movie.title}`}
+          onClose={() => setPlayerMode(null)}
+        />
+      )}
+    </>
+  )
+}
