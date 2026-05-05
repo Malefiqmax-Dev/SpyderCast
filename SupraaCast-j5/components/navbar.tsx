@@ -80,6 +80,13 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              {/* Live Sport Link */}
+              <Link
+                href="/live-sport"
+                className="flex items-center gap-1 text-sm text-foreground/70 transition-colors hover:text-foreground"
+              >
+                Live Sport
+              </Link>
             </div>
           </div>
 
@@ -182,6 +189,14 @@ export function Navbar() {
                   {link.label}
                 </Link>
               ))}
+              <Link
+                key="/live-sport"
+                href="/live-sport"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-foreground/70 transition-all hover:bg-white/5 hover:text-foreground backdrop-blur-sm"
+              >
+                Live Sport
+              </Link>
               {user && (
                 <button
                   onClick={() => { setSettingsOpen(true); setMenuOpen(false) }}
@@ -191,10 +206,12 @@ export function Navbar() {
                   Paramètres
                 </button>
               )}
+
+              
               {isAdmin && (
-                <Link 
-                  href="/admin" 
-                  onClick={() => setMenuOpen(false)} 
+                <Link
+                  href="/admin"
+                  onClick={() => setMenuOpen(false)}
                   className="mt-2 flex items-center gap-2 rounded-xl bg-amber-600/10 px-4 py-3 text-sm font-bold text-amber-400 border border-amber-500/20 transition-all hover:bg-amber-600/20"
                 >
                   <Shield className="h-4 w-4" />

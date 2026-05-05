@@ -4,7 +4,6 @@ import Image from "next/image"
 import { Play, Download, Star, Calendar, ChevronDown, Heart, Eye } from "lucide-react"
 import { getBackdropUrl, getImageUrl } from "@/lib/tmdb"
 import { PlayerModal } from "@/components/player-modal"
-import { AdPlayerModal } from "@/components/ad-player-modal"
 import { useAuth } from "@/lib/auth-context"
 import { useState } from "react"
 import { getSeriesPlayerUrl } from "@/lib/constants/player"
@@ -284,37 +283,25 @@ export function TVDetailClient({ show, seasonDetails }: TVDetailClientProps) {
                 </div>
                 <div className="mt-3 flex items-center gap-2">
                   <button
-                    onClick={() =>
+                    onClick={() => {
                       setPlayerInfo({
                         mode: "watch",
                         season: episode.season_number,
                         episode: episode.episode_number,
                         title: `${show.name} - S${episode.season_number}E${episode.episode_number}`,
-                      })
-                    }
-                    className="flex items-center gap-1.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:from-amber-400 hover:to-orange-500"
+                      });
+                    }}
+                    className="flex items-center gap-1.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-600 px-3 py-1.5 text-xs font-semibold text-foreground transition-all hover:from-amber-400 hover:to-orange-600"
                   >
                     <Play className="h-3.5 w-3.5 fill-current" />
                     Regarder
                   </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {playerInfo && (
-        <AdPlayerModal
-          tmdbId={show.id}
-          mediaType="tv"
-          season={playerInfo.season}
-          episode={playerInfo.episode}
-          title={playerInfo.title}
-          backdropPath={show.backdrop_path}
-          onClose={() => setPlayerInfo(null)}
-        />
-      )}
+                </div> {/* Closing div for buttons */}
+              </div> {/* Closing div for episode details */}
+            </div> {/* Closing outer div for a single episode */}
+          ))} {/* Closing episodes.map */}
+        </div> {/* Closing parent div for all episodes */}
+      </section> {/* Closing section for Seasons & Episodes */}
     </>
   )
 }

@@ -26,6 +26,7 @@ interface AuthContextType {
   user: AppUser | null
   isLoading: boolean
   isAdmin: boolean
+  
   signUp: (username: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   signOut: () => Promise<void>
@@ -222,6 +223,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext)
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider")
+  if (!ctx) {
+    throw new Error("useAuth must be used within AuthProvider")
+  }
   return ctx
 }
